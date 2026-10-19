@@ -1,5 +1,5 @@
 // 自動生成(tools/build-pages.js)。手で編集しない。
-const CACHE = 'karada-b07e3e61a4';
+const CACHE = 'karada-420d49ce0b';
 const PRECACHE = ["./","app.js","data/body.json","data/muscles.svg","data/skeleton.svg","icons/apple-touch-icon.png","icons/icon-192.png","icons/icon-512.png","icons/maskable-512.png","manifest.webmanifest"];
 const LIBS = ["https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"];
 self.addEventListener('install', e => {
