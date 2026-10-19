@@ -1,0 +1,29 @@
+<!doctype html><html><body style="margin:0"><div id="host"></div><pre id="out"></pre><script>
+// 骨格図の上で、出題の点がその骨(グループ)の上に乗っているかを調べ、外れていれば近くの骨の上へずらす。
+// tools/build-data.js が research/snap-req.json を書き、headless Chrome でこのページを開いて結果を受け取る。
+(async () => {
+  const [svgText, req] = await Promise.all([fetch('raw/skel-front-nolabel.svg').then(r => r.text()), fetch('snap-req.json').then(r => r.json())]);
+  const host = document.getElementById('host'); host.innerHTML = svgText;
+  const svg = host.querySelector('svg'); svg.setAttribute('width', '436'); svg.setAttribute('height', '842');
+  svg.style.display = 'block';
+  const r0 = svg.getBoundingClientRect(), sx = r0.width / 435.687, sy = r0.height / 841.89;
+  const at = (x, y) => document.elementFromPoint(r0.left + x * sx, r0.top + y * sy);
+  const inGroup = (el, id) => { for (let e = el; e && e !== svg; e = e.parentNode) if (e.id === id) return true; return false; };
+  const groupOf = el => { const ids = []; for (let e = el; e && e !== svg; e = e.parentNode) if (e.id && !/^(g|path|XMLID_)\d*/.test(e.id)) ids.push(e.id); return ids.join('>'); };
+  const out = [];
+  for (const q of req) {
+    const hit = at(q.x, q.y);
+    const res = { key: q.key, x: q.x, y: q.y, group: q.group, hitGroup: groupOf(hit), hitTag: hit && hit.tagName };
+    if (q.group && q.group !== '-' && !inGroup(hit, q.group)) {
+      let best = null;
+      for (let r = 1; r <= 30 && !best; r++) for (let a = 0; a < 360; a += 10) {
+        const x = q.x + r * Math.cos(a * Math.PI / 180), y = q.y + r * Math.sin(a * Math.PI / 180);
+        if (inGroup(at(x, y), q.group)) { best = [Math.round(x * 10) / 10, Math.round(y * 10) / 10]; break; }
+      }
+      res.snapped = best;
+    }
+    out.push(res);
+  }
+  document.getElementById('out').textContent = JSON.stringify(out);
+})();
+</script></body></html>

@@ -1,0 +1,5 @@
+node_modules/
+research/raw/
+research/crop-*
+research/crops.*
+research/debug-hip.*
